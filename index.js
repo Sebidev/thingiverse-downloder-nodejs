@@ -5,8 +5,8 @@ const { exec } = require('child_process');
 
 const url = process.argv.slice(2) + '/zip';
 const localPath = './thingiverse.zip';
-const UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36";
-const command = `curl -L -o ${localPath} -A "${UserAgent}" ${url}`;
+const userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36";
+const command = `curl -L -o ${localPath} -A "${userAgent}" ${url}`;
 
 const stlPaths = [];
 
