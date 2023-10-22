@@ -3,10 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 
-const url = process.argv.slice(2) + '/zip';
+const originalUrl = process.argv.slice(2);
+const link = String(originalUrl).replace(/\/(makes|files|remixes|apps)$/, "/zip");
 const localPath = './thingiverse.zip';
 const userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36";
-const command = `curl -L -o ${localPath} -A "${userAgent}" ${url}`;
+const command = `curl -L -o ${localPath} -A "${userAgent}" ${link}`;
 
 const stlPaths = [];
 
@@ -28,7 +29,7 @@ function processDirectory(directory) {
     });
 }
 
-if (url.includes("thingiverse.com")) {
+if (link.includes("thingiverse.com")) {
     exec(command, (error, stdout, stderr) => {
       if (error) {
           console.error(`exec error: ${error}`);
