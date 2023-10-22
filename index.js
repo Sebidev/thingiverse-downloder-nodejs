@@ -4,7 +4,7 @@ const path = require('path');
 const { exec } = require('child_process');
 
 const url = process.argv.slice(2) + '/zip';
-const localPath = './downloadedFile.zip';
+const localPath = './thingiverse.zip';
 const UserAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36";
 const command = `curl -L -o ${localPath} -A "${UserAgent}" ${url}`;
 
@@ -28,40 +28,47 @@ function processDirectory(directory) {
     });
 }
 
-exec(command, (error, stdout, stderr) => {
-    if (error) {
-        console.error(`exec error: ${error}`);
-        return;
-    }
-    console.log(`Datei wurde nach ${localPath} heruntergeladen.`);
-    console.log(stderr);
+if (url.includes("thingiverse.com")) {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+          console.error(`exec error: ${error}`);
+          return;
+      }
+      console.log(`Datei wurde nach ${localPath} heruntergeladen.`);
+      console.log(stderr);
 
-    // Definieren Sie den Pfad zur ZIP-Datei und den Zielordner
-    const zipFilePath = localPath;
-    const targetFolder = './tmp';
-    const stlFolder = './tmp/files'
+      // Definieren Sie den Pfad zur ZIP-Datei und den Zielordner
+      const zipFilePath = localPath;
+      const targetFolder = './tmp';
+      const stlFolder = './tmp/files'
 
-    // Erstellen Sie ein AdmZip-Objekt
-    const zip = new AdmZip(zipFilePath);
+      // Erstellen Sie ein AdmZip-Objekt
+      const zip = new AdmZip(zipFilePath);
 
-    // Entpacken Sie die Datei in den Zielordner
-    zip.extractAllTo(targetFolder, true);
+      // Entpacken Sie die Datei in den Zielordner
+      zip.extractAllTo(targetFolder, true);
 
-    // Verarbeitet das Hauptverzeichnis und alle Unterverzeichnisse
-    processDirectory(targetFolder);
+      // Verarbeitet das Hauptverzeichnis und alle Unterverzeichnisse
+      processDirectory(targetFolder);
 
-    // ZIP-Datei löschen
-    fs.unlinkSync(zipFilePath);
+      fs.rmdirSync(targetFolder + '/images');
 
-    // STL-Dateien in einen eigenen Ordner verschieben
-    if (!fs.existsSync(stlFolder)) {
-    fs.mkdirSync(stlFolder);
-    }
+      // ZIP-Datei löschen
+      fs.unlinkSync(zipFilePath);
 
-    stlPaths.forEach(stlPath => {
-    const destPath = path.join(stlFolder, path.basename(stlPath));
-    fs.renameSync(stlPath, destPath);
-    });
+      // STL-Dateien in einen eigenen Ordner verschieben
+      if (!fs.existsSync(stlFolder)) {
+      fs.mkdirSync(stlFolder);
+      }
 
-    console.log(stlPaths);
-});
+      stlPaths.forEach(stlPath => {
+      const destPath = path.join(stlFolder, path.basename(stlPath));
+      fs.renameSync(stlPath, destPath);
+      });
+
+      console.log(stlPaths);
+  });
+} else {
+    console.log("Der String enthält nicht 'thingiverse.com'.");
+    return;
+}
